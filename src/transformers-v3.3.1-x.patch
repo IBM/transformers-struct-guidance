@@ -1,0 +1,42 @@
+From 4729b6de7436b4cc614a91ee378be0176150ad5d Mon Sep 17 00:00:00 2001
+From: ramon-astudillo <ramon.astudillo@ibm.com>
+Date: Fri, 23 Oct 2020 05:57:07 -0400
+Subject: [PATCH] Updated x-former code
+
+---
+ src/transformers/modeling_gpt2.py | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/src/transformers/modeling_gpt2.py b/src/transformers/modeling_gpt2.py
+index 3ab1660..283e116 100644
+--- a/src/transformers/modeling_gpt2.py
++++ b/src/transformers/modeling_gpt2.py
+@@ -570,14 +570,17 @@ class GPT2Model(GPT2PreTrainedModel):
+ 
+         # Attention mask.
+         if attention_mask is not None:
+-            assert batch_size > 0, "batch_size has to be defined and > 0"
+-            attention_mask = attention_mask.view(batch_size, -1)
+-            # We create a 3D attention mask from a 2D tensor mask.
+-            # Sizes are [batch_size, 1, 1, to_seq_length]
+-            # So we can broadcast to [batch_size, num_heads, from_seq_length, to_seq_length]
+-            # this attention mask is more simple than the triangular masking of causal attention
+-            # used in OpenAI GPT, we just need to prepare the broadcast dimension here.
+-            attention_mask = attention_mask[:, None, None, :]
++
++            # If tensor already has the right size, no need to expand it
++            if len(attention_mask.shape) != 4:
++                assert batch_size > 0, "batch_size has to be defined and > 0"
++                attention_mask = attention_mask.view(batch_size, -1)
++                # We create a 3D attention mask from a 2D tensor mask.
++                # Sizes are [batch_size, 1, 1, to_seq_length]
++                # So we can broadcast to [batch_size, num_heads, from_seq_length, to_seq_length]
++                # this attention mask is more simple than the triangular masking of causal attention
++                # used in OpenAI GPT, we just need to prepare the broadcast dimension here.
++                attention_mask = attention_mask[:, None, None, :]
+ 
+             # Since attention_mask is 1.0 for positions we want to attend and 0.0 for
+             # masked positions, this operation will create a tensor which is 0.0 for
+-- 
+1.8.3.1
+
