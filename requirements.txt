@@ -1,0 +1,6 @@
+torch==1.4.0
+nltk
+# for debug
+ipdb
+# check README.md for install 
+-e src/transformers/
