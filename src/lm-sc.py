@@ -133,7 +133,7 @@ class ScLM:
 
             loss_avg = loss_sum/token_count
 
-            print('Total loss:', loss_sum, token_count)
+            # print('Total loss:', loss_sum, token_count)
             return loss_avg
 
         else:
@@ -441,7 +441,6 @@ if __name__ == "__main__":
             sclm.model.eval()
             with torch.no_grad():
                 validation_loss, _, _ = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE)
-            print('validation loss: {}'.format(validation_loss))
             best_validation_loss = validation_loss
             sclm.model.train()
             print('resume training; validation loss: {}'.format(best_validation_loss))
@@ -455,7 +454,7 @@ if __name__ == "__main__":
         
         early_stopping_counter = utils.EarlyStopping(best_validation_loss=best_validation_loss, no_improvement_count=no_improvement_count, threshold=args.early_stopping_threshold)
 
-        for epoch in range(n_epochs):
+        for epoch in range(starting_epoch, n_epochs):
             random.shuffle(train_lines)
 
             count = 0  # cumulative count of training examples
@@ -520,8 +519,8 @@ if __name__ == "__main__":
             sclm.model.eval()
 
             with torch.no_grad():
-                validation_word_prediction_loss = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE, word_prediction_loss_only=True)
-                validation_loss, _, _ = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE)
+                # validation_word_prediction_loss = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE, word_prediction_loss_only=True)
+                validation_loss, validation_word_prediction_loss, _ = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE)
             print('Epoch {} validation loss: {} validation next-word prediction loss: {}'.format(epoch, validation_loss, validation_word_prediction_loss))
 
             is_early_stop = early_stopping_counter.check_stopping_criterion(validation_loss)

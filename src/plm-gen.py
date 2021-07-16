@@ -693,6 +693,8 @@ if __name__ == "__main__":
     parser.add_argument('--add_structured_mask', action='store_true', help="Use structurally masked attention")
     parser.add_argument('--buffer_head', type=int, help='Specify the index of attention heads for buffer-related structural masks.')
     parser.add_argument('--stack_head', type=int, help='Specify the index of attention heads for stack-related structural masks.')
+    parser.add_argument('--add_eos', action='store_true', help="Add ROOT token as the end-of-sequence token.")
+
 
     args = parser.parse_args()
 
@@ -755,6 +757,12 @@ if __name__ == "__main__":
         print("Loading dev data from {}".format(dev_data_path), file=sys.stderr)
         train_lines = load_data(train_data_path)
         dev_lines = load_data(dev_data_path)
+
+        # Add EOS token
+        if args.add_eos:
+            print('Add EOS token.')
+            train_lines = [line + ' ' + ROOT for line in train_lines]
+        # dev_lines = [line + ' ' + ROOT for line in dev_lines]
 
         if args.restore_from is not None:
             plm.model.eval()
