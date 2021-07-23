@@ -7,3 +7,10 @@ output/
 oracle_gen/
 pretrained/
 src/transformers/
+train_logs/
+eval_logs
+*.sh
+surprisals/
+eval_scripts/
+util_scripts/
+backup/
