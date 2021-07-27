@@ -35,7 +35,6 @@ class LM:
         """
         Assume a data batch as a list of sequences.
         """
-        # tokens_batch = [[self.tokenizer.bos_token] + self.tokenizer.tokenize(line) for line in data_batch]
         tokens_batch = [self.tokenizer.tokenize(line) for line in data_batch]
 
         token_count_batch = [len(tokens) for tokens in tokens_batch]
@@ -52,8 +51,6 @@ class LM:
         label_ids_padded_batch = [self.tokenizer.convert_tokens_to_ids(tokens) + [-100 for _ in range(batch_max_len - len(tokens))] for tokens in tokens_batch]
         label_ids = torch.tensor(label_ids_padded_batch).to(device)
 
-        # output1 = self.model(input_ids, labels=input_ids, attention_mask=attention_mask, return_dict=True)
-        # print(output1.loss.item())
         output = self.model(input_ids, labels=label_ids, attention_mask=attention_mask, return_dict=True)
 
         loss = output.loss
@@ -161,7 +158,6 @@ if __name__ == "__main__":
     parser.add_argument('--lr', type=float, default=1e-5, help='Learning rate')
     parser.add_argument('--epochs', type=int, default=10, help='Number of training epochs')
     parser.add_argument('--report', type=int, default=1000, help='Frequency of evaluating validation data')
-    # parser.add_argument('--valid_every', type=int, default=10000, help='Frequency of validating and saving model parameters after number of training batches')
     parser.add_argument('--sample_every', type=int, default=10000, help='Frequency of generating samples from the model during training')
     parser.add_argument('--seed', type=int, default=None, help='random seed')
     parser.add_argument('--do_train', action='store_true', help='Whether to train the model')
@@ -169,9 +165,7 @@ if __name__ == "__main__":
     parser.add_argument('--do_eval', action='store_true', help='Whether to use the model for surprisal estimation.')
     parser.add_argument('--model_path', type=str, default=None, help='Name prefix of the model to be trained and saved')
     parser.add_argument('--restore_from', type=str, default=None, help='Path to the trained model checkpoint. Will use the pretrained model if path not specified.')
-    # parser.add_argument('--freeze_embedding', action='store_true', help="Freeze the weights of the input embedding layer.")
     parser.add_argument('--batch_size', type=int, default=5, help="Size of a training batch.")
-    # parser.add_argument('--frequent_validation', action='store_true', help="Add frequent validations across epochs")
     parser.add_argument('--early_stopping_threshold', type=int, default=2, help='Threshold for early stopping.')
     parser.add_argument('--random_init', action='store_true', help="Randomly initialize model parameters.")
     parser.add_argument('--fpath', type=str, help='Path to text file for estimating surprisals.')
@@ -243,9 +237,6 @@ if __name__ == "__main__":
         for epoch in range(starting_epoch, n_epochs):
             random.shuffle(train_lines)
 
-            loss_sum = 0 # cumulative loss of training examples; reset to 0 after every training status report
-            token_count = 0 # count of training tokens; reset to 0 after every training status report
-            update_count = 0 # count of the number of updates; reset to 0 after every training status report
             count = 0  # cumulative count of training examples
             batch_count = 0 # cumulative count of training batches
 
@@ -256,26 +247,15 @@ if __name__ == "__main__":
                 loss.backward()
                 optimizer.step()
 
-                # loss_sum += loss.item()*batch_token_count
-                loss_sum += loss.item()
-                token_count += batch_token_count
-                update_count += 1
                 batch_count += 1
                 count += len(train_data_batch)
                 
                 if batch_count > 0 and batch_count % args.report == 0:
-                    # print('Epoch {:.3f} loss: {}'.format(epoch + count/len(train_lines), loss_sum/token_count))
                     print('Epoch {:.3f} loss: {}'.format(epoch + count/len(train_lines), loss.item()))
-                    loss_sum = 0
-                    token_count = 0
 
                 if batch_count > 0  and batch_count % args.sample_every == 0:
                     lm.model.eval()
                     with torch.no_grad():
-                        # if batch_count % args.valid_every == 0:
-                        #     validation_loss = lm.get_loss(dev_lines, batch_size=args.batch_size)
-                        #     print('validation loss: {}'.format(validation_loss))
-
                         samples = lm.generate(prompt="<|endoftext|>")
                         for sample in samples:
                             print(sample)
@@ -295,7 +275,6 @@ if __name__ == "__main__":
             if validation_loss < best_validation_loss:
                 best_validation_loss = validation_loss
                 print("new best... saving model to {}".format(MODEL_PATH))
-                # torch.save(lm.model.state_dict(), MODEL_PATH)
                 torch.save(
                     {'epoch': epoch,
                     'no_improvement_count': early_stopping_counter.counter,
@@ -319,7 +298,6 @@ if __name__ == "__main__":
             print('Test loss: {}'.format(validation_loss))
             validation_loss = lm.get_loss(test_lines, batch_size=1)
             print('Test loss: {}'.format(validation_loss))
-        # print('PPL: {}'.format(lm.get_word_level_perplexity(test_lines)))
             print('PPL: {}'.format(lm.get_word_level_perplexity(test_lines, add_bos_token=False)))
 
 

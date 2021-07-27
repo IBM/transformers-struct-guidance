@@ -66,10 +66,8 @@ class ScLM:
         Assume each line of the batch input contains tokenized sentence paired with action ngram sequence.
         """
         if add_eos_token:
-            # tokens_batch = [[self.tokenizer.bos_token] + line[0] + [self.tokenizer.bos_token] for line in line_batch]
             tokens_batch = [line[0] + [self.tokenizer.bos_token] for line in line_batch]
         else:
-            # tokens_batch = [[self.tokenizer.bos_token] + line[0] for line in line_batch]
             tokens_batch = [line[0] for line in line_batch]
 
         batch_max_len = np.max([len(tokens) for tokens in tokens_batch])
@@ -86,21 +84,14 @@ class ScLM:
         label_ids_padded_batch = [self.tokenizer.convert_tokens_to_ids(tokens) + [-100 for _ in range(batch_max_len - len(tokens))] for tokens in tokens_batch]
         label_ids = torch.tensor(label_ids_padded_batch).to(device)
 
-        # set_trace(context=10)
         output  = self.model(input_ids, labels=label_ids, attention_mask=attention_mask, output_hidden_states=True)
 
         word_prediction_loss = output[0]
-
-        # set_trace(context=10)
 
         if scaffold_type == 'next':
             action_ids_batch = torch.tensor([[self.action_vocab.token2index[a_ngram] for a_ngram in line[1]] + [-100 for _ in range(batch_max_len - len(line[1]))] for line in line_batch]).to(device)
         elif scaffold_type == 'past':
             action_ids_batch = torch.tensor([[self.action_vocab.pad_index] + [self.action_vocab.token2index[a_ngram] for a_ngram in line[1][:-1]] + [-100 for _ in range(batch_max_len - len(line[1]))] for line in line_batch]).to(device)
-            # if add_eos_token == True:
-            #     action_ids_batch = torch.tensor([[self.action_vocab.pad_index] + [self.action_vocab.token2index[a_ngram] for a_ngram in line[1]] + [-100 for _ in range(batch_max_len - len(line[1]) - 1)] for line in line_batch]).to(device)
-            # else:
-            #     action_ids_batch = torch.tensor([[self.action_vocab.pad_index] + [self.action_vocab.token2index[a_ngram] for a_ngram in line[1][:-1]] + [-100 for _ in range(batch_max_len - len(line[1]))] for line in line_batch]).to(device)
         else:
             raise NotImplementedError
 
@@ -118,7 +109,6 @@ class ScLM:
             token_count = 0
 
             for line in dev_lines:
-                # tokens = [self.tokenizer.bos_token] + line[0]
                 tokens = line[0]
                 ids = self.tokenizer.convert_tokens_to_ids(tokens)
                 input_ids = torch.tensor([ids]).to(device) # batch size = 1
@@ -126,14 +116,9 @@ class ScLM:
                 loss = self.model(input_ids, labels=input_ids)[0].item()
                 loss_sum += loss*(len(tokens)-1)
                 token_count += len(tokens) - 1
-                # print(loss, len(tokens))
-
-                # print(loss, len(tokens)-1)
-                # print(' '.join(tokens))
 
             loss_avg = loss_sum/token_count
 
-            # print('Total loss:', loss_sum, token_count)
             return loss_avg
 
         else:
@@ -143,10 +128,6 @@ class ScLM:
             action_token_count = 0
 
             for line_batch in get_batches(dev_lines, args.batch_size):
-                # tokens_batch = [[self.tokenizer.bos_token] + line[0] for line in line_batch]
-                # tokens_batch = [line[0] for line in line_batch]
-                # n_word_token = np.sum([len(item)-1 for item in tokens_batch])
-
                 n_word_token = np.sum([len(word_tokens) - 1 for word_tokens, _ in line_batch])
                 n_action_token = n_word_token + len(line_batch)
 
@@ -211,10 +192,6 @@ class ScLM:
             loss = self.model(input_ids, labels=input_ids)[0].item() # batch size = 1
             nll_total += loss*(len(tokens)-1)
             word_count += len(words)
-
-            # print(sent)
-            # print(' '.join(self.tokenizer.tokenize(sent)), len(tokens)-1)
-            # print(loss)
 
             total_token_count += len(tokens)-1
 
@@ -345,15 +322,6 @@ def get_batches(lines, batch_size):
     return batches
 
 
-# # load action ngram list and initialize embeddings
-# with open('bllip-lg_action_ngram_list.txt') as f:
-#     lines = f.readlines()
-# symbols = ['<pad>', '_'] + [line.strip().split()[0] for line in lines]
-# action_vocab = Vocabulary(symbols, 0)
-
-#action_factored_embeddings = FactoredEmbeddings(action_vocab,768, 'base')
-
-
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_data', type=str, help='Path to training data.')
@@ -373,9 +341,7 @@ if __name__ == "__main__":
     parser.add_argument('--do_eval', action='store_true', help='Whether to use the model for surprisal estimation.')
     parser.add_argument('--model_path', type=str, default=None, help='Path of the model to be trained and saved')
     parser.add_argument('--restore_from', type=str, default=None, help='Path to the trained model checkpoint. Will use the pretrained model if path not specified.')
-    # parser.add_argument('--freeze_embedding', action='store_true', help="Freeze the weights of the input embedding layer.")
     parser.add_argument('--batch_size', type=int, default=5, help="Size of a training batch.")
-    # parser.add_argument('--frequent_validation', action='store_true', help="Add frequent validations across epochs")
     parser.add_argument('--early_stopping_threshold', type=int, default=2, help='Threshold for early stopping.')
     parser.add_argument('--random_init', action='store_true', help="Randomly initialize model parameters.")
     parser.add_argument('--pretokenized', action='store_true', help="Whether input sentences for evaluating surprisals are pertokenized or not.")
@@ -407,7 +373,6 @@ if __name__ == "__main__":
     if args.restore_from is not None:
         print('Load parameters from {}'.format(args.restore_from), file=sys.stderr)
         checkpoint = torch.load(args.restore_from)
-        # sclm.model.load_state_dict(checkpoint)
         sclm.model.load_state_dict(checkpoint['model_state_dict'])
 
     SCAFFOLD_TYPE = args.scaffold_type
@@ -470,8 +435,6 @@ if __name__ == "__main__":
                 loss.backward()
                 optimizer.step()
 
-                # set_trace(context=10)
-
                 count += len(line_batch)
                 batch_count += 1
 
@@ -492,7 +455,6 @@ if __name__ == "__main__":
                         sclm.model.eval()
 
                         with torch.no_grad():
-                            # validation_word_prediction_loss = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE, word_prediction_loss_only=True)
                             validation_loss, validation_word_prediction_loss, _ = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE)
                         print('Epoch {:.3f} validation loss: {} validation next-word prediction loss: {}'.format(epoch + count/len(train_lines), validation_loss, validation_word_prediction_loss))
 
@@ -505,7 +467,6 @@ if __name__ == "__main__":
                         if validation_loss < best_validation_loss:
                             best_validation_loss = validation_loss
                             print("new best... saving model to {}".format(MODEL_PATH))
-                            # torch.save(sclm.model.state_dict(), MODEL_PATH)
                             torch.save(
                                 {'epoch': epoch,
                                 'scaffold_type': SCAFFOLD_TYPE,
@@ -519,7 +480,6 @@ if __name__ == "__main__":
             sclm.model.eval()
 
             with torch.no_grad():
-                # validation_word_prediction_loss = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE, word_prediction_loss_only=True)
                 validation_loss, validation_word_prediction_loss, _ = sclm.get_validation_loss(dev_lines, scaffold_type=SCAFFOLD_TYPE)
             print('Epoch {} validation loss: {} validation next-word prediction loss: {}'.format(epoch, validation_loss, validation_word_prediction_loss))
 
@@ -532,7 +492,6 @@ if __name__ == "__main__":
             if validation_loss < best_validation_loss:
                 best_validation_loss = validation_loss
                 print("new best... saving model to {}".format(MODEL_PATH))
-                # torch.save(sclm.model.state_dict(), MODEL_PATH)
                 torch.save(
                     {'epoch': epoch,
                     'scaffold_type': SCAFFOLD_TYPE,
@@ -550,8 +509,6 @@ if __name__ == "__main__":
 
         test_data_path = args.test_data
 
-        # set_trace(context=10)
-
         test_sents = []
         lines = load_sents(args.test_data)
         for line in lines:
@@ -562,36 +519,6 @@ if __name__ == "__main__":
         with torch.no_grad():
             ppl = sclm.get_word_ppl(test_sents)
         print('PPL: {}'.format(ppl))
-
-
-        # if test_data_path.endswith('txt'):
-
-        #     test_sents = load_sents(args.test_data)
-
-        #     with torch.no_grad():
-        #         ppl = sclm.get_word_ppl(test_sents, add_bos_token=True)
-        #     print('PPL: {}'.format(ppl))
-        # else:
-        #     test_lines = load_data(test_data_path, sclm.tokenizer, BOS_token=sclm.tokenizer.bos_token)
-
-        #     test_lines = [[w_tokens, ['_' for _ in range(len(a_tokens))]] for w_tokens, a_tokens in test_lines]
-
-        #     print(test_lines[:1])
-
-        #     with torch.no_grad():
-        #         test_loss = sclm.get_validation_loss(test_lines, SCAFFOLD_TYPE, word_prediction_loss_only=True)
-        #     print('Test loss: {}'.format(test_loss))            
-
-        #     with torch.no_grad():
-        #         _, test_loss, _ = sclm.get_validation_loss(test_lines, SCAFFOLD_TYPE)
-        #     print('Test loss: {}'.format(test_loss))
-
-        # if args.test_data is not None:
-        #     test_sents = load_sents(args.test_data)
-        #     with torch.no_grad():
-        #         ppl = sclm.get_word_ppl(test_sents)
-        #     print('PPL: {}'.format(ppl))
-
 
 
     # Estimate token surprisal values for unparsed sentences
