@@ -1,8 +1,6 @@
 # Structural Guidance for Transformer Language Models
 
-ACL2021 paper code
-
-This repository includes inplementation for Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
+This repository accompanies the paper "Structural Guidance for Transformer Language Models" published in ACL 2021. It includes inplementation for Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
 
 ## Environment
 
@@ -24,6 +22,8 @@ and then just commit this patch
 
 
 ## Prepare parsing oracle files 
+
+PLM and ScLM require syntactic parses to derive the action sequence oracle. The following command demonstrates how to prepare oracle files for these models.
 
 ```
 python src/get_oracle.py --gen --fpath train.txt > train_gen.oracle
