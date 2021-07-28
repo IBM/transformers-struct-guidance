@@ -31,6 +31,17 @@ python src/get_oracle.py --gen --fpath dev.txt > dev_gen.oracle
 python src/get_oracle.py --gen --fpath test.txt > test_gen.oracle
 ```
 
+## Model training
+LM:
+
+```
+# Training model
+python src/lm.py --train_data train.txt --dev_data dev.txt --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --random_init --batch_size ${BATCH_SIZE} --report ${REPORT} --sample_every ${SAMPLE_EVERY} --model_path ${MODEL_PATH}
+# Compute word-level perplexity
+python src/lm.py --restore_from ${MODEL_PATH} --test_data test.txt --do_test
+# Estimate word surprisals
+python src/lm.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
+```
 
 ## Estimate word surprisals
 

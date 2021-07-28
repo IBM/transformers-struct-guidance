@@ -195,7 +195,7 @@ class ScLM:
 
             total_token_count += len(tokens)-1
 
-        print(nll_total, word_count, total_token_count)
+        #print(nll_total, word_count, total_token_count)
         nll_avg = nll_total/word_count
         return np.exp(nll_avg)
 
