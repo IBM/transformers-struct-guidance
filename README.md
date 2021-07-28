@@ -31,16 +31,34 @@ python src/get_oracle.py --gen --fpath dev.txt > dev_gen.oracle
 python src/get_oracle.py --gen --fpath test.txt > test_gen.oracle
 ```
 
-## Model training
-LM:
+## Vanilla Language Models (LM)
+
+The script `src/lm.py` implements a vanilla Transformer language model. Below are the commands for model training and evaluation, as well as commands to compute word-level surprisals from a trained model.
 
 ```
-# Training model
+# Model training
 python src/lm.py --train_data train.txt --dev_data dev.txt --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --random_init --batch_size ${BATCH_SIZE} --report ${REPORT} --sample_every ${SAMPLE_EVERY} --model_path ${MODEL_PATH}
+
 # Compute word-level perplexity
 python src/lm.py --restore_from ${MODEL_PATH} --test_data test.txt --do_test
+
 # Estimate word surprisals
 python src/lm.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
+```
+
+## Scaffoled Language Models (ScLM)
+
+The script `src/lm-sc.py` implements Transformer language model with structural prediction as an auxilliary task, referred as ScLM in short. The commanline variable, ${SCAFFOLD_TYPE}, can be set as `past` or `next`, which corresponds to `ScLM-past` or `ScLM-next` respectively in the paper.
+
+```
+# Model training  
+python src/lm-sc.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --random_init --batch_size ${BATCH_SIZE} --report ${REPORT} --sample_every ${SAMPLE_EVERY} --alpha 0.5 --scaffold_type ${SCAFFOLD_TYPE} --model_path ${MODEL_PATH}
+
+# Compute word-level perplexity
+python src/plm-gen.py --restore_from model_params/xplm_bllip-lg_rand-init_1101_5.params --test_data data/bllip-md/oracle_gen/test_gen.oracle --do_test
+
+# Estimate word surprisals
+python src/lm-sc.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
 ```
 
 ## Estimate word surprisals
