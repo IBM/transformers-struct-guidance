@@ -61,6 +61,17 @@ python src/plm-gen.py --restore_from model_params/xplm_bllip-lg_rand-init_1101_5
 python src/lm-sc.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
 ```
 
+## Parsing as Language Modelling (PLM/PLM-mask)
+
+The script `src/plm-gen.py` implements the idea of generative parsing as language modelling, a probabilistic model of top-down parsing action sequence, parameterized by Transformer architecture.
+
+```
+# Estimate word surprisals with PLM
+python src/plm-gen.py --restore_from ${MODEL_PATH} --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_SUITE_PATH} > ${OUTPUT_PATH} 2>${EVAL_LOG_PATH}
+# Estimate word surprisals with PLM-mask
+python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_    SUITE_PATH} > ${OUTPUT_PATH} 2>>${EVAL_LOG_PATH}
+```.
+
 ## Estimate word surprisals
 
 LM:
