@@ -4,11 +4,11 @@ import re
 import time
 import argparse
 import random
+import functools
 import numpy as np
 import nltk
-from transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, AdamW
 import torch
-import functools
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, AdamW
 import utils
 print = functools.partial(print, flush=True)
 
@@ -84,7 +84,6 @@ class PLM:
         Given a prefix of a generative parsing action sequence, sample a continuation
         from the model, subject to the constraints of valid actions.
         Return a bracketed tree string.
-        prefix:
         '''
         nt_count = 0
         reduce_count = 0
@@ -410,6 +409,9 @@ class PLM:
         return loss_sum/token_count
 
     def get_batch_loss(self, lines, add_structured_mask, device='cuda'):
+        """
+        Compute the loss for one batch of action sequences.
+        """
         line_batch = [ROOT + ' ' + line for line in lines]
         tokens_batch = self.tokenize_batch(line_batch)
 
@@ -439,6 +441,9 @@ class PLM:
         return loss, batch_token_count
 
     def get_loss(self, lines, add_structured_mask, batch_size, device='cuda'):
+        """
+        Compute the loss on a list of action sequences via batched computations.
+        """
         total_loss = 0
         total_token_count = 0
 
@@ -614,7 +619,6 @@ def get_attention_mask_from_actions(tokens, max_len=None):
 
     # ensure pad is zero at testing
     if max_len is not None:
-        # FIXME: Unsure about masking pattern for element 2
         attention_mask[0, :, :, len(tokens):] = 0
 
     return attention_mask

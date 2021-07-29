@@ -287,22 +287,6 @@ def load_data(path, tokenizer, BOS_token=None):
     return data
 
 
-def load_sent_parse_pair_data(path):
-    '''
-    Load data in the format of paired sentence and action ngrams.
-    The sentence and action ngram sequence are separated by "\t".
-    e.g.
-    "The entire market is at its lowest price-earnings multiple since the dawn of time . <eos>\t
-    NT(S)_NT(NP)  _  _  REDUCE()_NT(VP) NT(PP) NT(NP)_NT(NP) _ _ _ REDUCE()_NT(PP) NT(NP)_NT(NP) _
-    REDUCE()_NT(PP) NT(NP) REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE() REDUCE()"
-    '''
-    with open(path) as f:
-        lines = f.readlines()
-    lines = [line.strip().split('\t') for line in lines]
-    lines = [[line[0].split(), line[1].split()] for line in lines]
-    return lines
-
-
 def get_batches(lines, batch_size):
     if len(lines) % batch_size == 0:
         num_batches = len(lines) // batch_size
