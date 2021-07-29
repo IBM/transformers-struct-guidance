@@ -1,6 +1,6 @@
 # Structural Guidance for Transformer Language Models
 
-This repository accompanies the paper "Structural Guidance for Transformer Language Models" published in ACL 2021. It includes inplementation for Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
+This repository accompanies the paper "Structural Guidance for Transformer Language Models" published in ACL 2021. It includes inplementation of Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
 
 ## Environment
 
