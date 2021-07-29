@@ -252,8 +252,6 @@ class PLM:
 
             prediction_scores_batch = self.model(input_ids_batch, attention_mask=attention_mask_batch)[0]
 
-            actions = self.NT_ACTIONS + [REDUCE] + [token]
-
             pq_this_all_valid_actions_batch = []
             pq_this_all_valid_action_ids_batch = []
             for p_this in pq_this[batch_size*i:batch_size*(i+1)]:
@@ -288,11 +286,9 @@ class PLM:
         Return a list of subword tokens and surprisals.
         '''
         tokens = self.tokenizer.tokenize(sent)
-        idxs = self.tokenizer.convert_tokens_to_ids(tokens)
 
         prefix = ROOT
         prefix_tokens = self.tokenizer.tokenize(prefix)
-        prefix_ids = self.tokenizer.convert_tokens_to_ids(prefix_tokens)
 
         surprisals = []
         log_probs = []
