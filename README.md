@@ -63,22 +63,28 @@ python src/lm-sc.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_
 
 ## Parsing as Language Modelling (PLM/PLM-mask)
 
-The script `src/plm-gen.py` implements the idea of generative parsing as language modelling, a probabilistic model of top-down parsing action sequence, parameterized by Transformer architecture.
+The script `src/plm-gen.py` implements the idea of generative parsing as language modelling, a probabilistic model of top-down parsing action sequence. There are two variants: PLM and PLM-mask.
 
+For PLM:
 ```
 # Model training for PLM
 python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --report ${REPORT} --sample_every ${SAMPLE_EVERY} --valid_every ${VALID_EVERY} --model_path ${MODEL_PATH}
-# Model training for PLM-mask
-python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --add_structured_mask --buffer_head 0 --stack_head 1 --report ${REPORT} --sample_every ${SAMPLE_EVERY} --valid_every ${VALID_EVERY} --model_path ${MODEL_PATH}
 
 # Estimate word-level perplexity with PLM
 python src/plm-gen.py --restore_from ${MODEL_PATH} --test_data test_gen.oracle --do_test
-# Estimate word-level perplexity with PLM-mask
-python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --test_data test_gen.oracle --do_test
 
 # Estimate word surprisals with PLM
 python src/plm-gen.py --restore_from ${MODEL_PATH} --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_SUITE_PATH} > ${OUTPUT_PATH} 2>${EVAL_LOG_PATH}
+```
+
+For PLM-mask:
+```
+# Model training for PLM-mask
+python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --add_structured_mask --buffer_head 0 --stack_head 1 --report ${REPORT} --sample_every ${SAMPLE_EVERY} --valid_every ${VALID_EVERY} --model_path ${MODEL_PATH}
+
+# Estimate word-level perplexity with PLM-mask
+python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --test_data test_gen.oracle --do_test
+
 # Estimate word surprisals with PLM-mask
 python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_SUITE_PATH} > ${OUTPUT_PATH} 2>>${EVAL_LOG_PATH}
 ```
-

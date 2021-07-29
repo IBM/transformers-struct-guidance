@@ -296,8 +296,8 @@ if __name__ == "__main__":
         with torch.no_grad():
             validation_loss = lm.get_loss(test_lines, batch_size=args.batch_size)
             print('Test loss: {}'.format(validation_loss))
-            validation_loss = lm.get_loss(test_lines, batch_size=1)
-            print('Test loss: {}'.format(validation_loss))
+            #validation_loss = lm.get_loss(test_lines, batch_size=1)
+            #print('Test loss: {}'.format(validation_loss))
             print('PPL: {}'.format(lm.get_word_level_perplexity(test_lines, add_bos_token=False)))
 
 
@@ -309,8 +309,7 @@ if __name__ == "__main__":
             sents = load_data(args.fpath)
         else:
             sents = ["The dogs under the tree are barking.", "The dogs under the tree is barking.",
-                    "The keys to the cabinet are on the table.", "The keys to the cabinet is on the table.",
-                    "No author that liked the senator has ever been popular.", "The author that liked no senator has ever been popular.",]
+                    "The keys to the cabinet are on the table.", "The keys to the cabinet is on the table.",]
 
         print('sentence_id\ttoken_id\ttoken\tsurprisal')
 

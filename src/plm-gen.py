@@ -396,7 +396,6 @@ class PLM:
         token_count = 0
 
         for line in dev_lines:
-            #tokens = [ROOT] + tokenizer.tokenize(line)
             words = line.strip().split()
             tokens = [ROOT] + [token for word in words for token in self.tokenizer.tokenize(word, add_prefix_space=True)]
             ids = self.tokenizer.convert_tokens_to_ids(tokens)
@@ -841,9 +840,7 @@ if __name__ == "__main__":
             sents = load_data(args.fpath)
         else:
             sents = ["The dogs under the tree are barking.", "The dogs under the tree is barking.",
-                    "The keys to the cabinet are on the table.", "The keys to the cabinet is on the table.",
-                    "No author that liked the senator has ever been popular.", "The author that liked no senator has ever been popular.",]
-
+                    "The keys to the cabinet are on the table.", "The keys to the cabinet is on the table.",]
 
         print('sentence_id\ttoken_id\ttoken\tsurprisal')
 
