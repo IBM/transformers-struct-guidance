@@ -1,13 +1,9 @@
-from ipdb import set_trace
 import os
 import sys
-import re
-import time
 import argparse
 import random
 import numpy as np
 import nltk
-from nltk.tokenize.treebank import TreebankWordDetokenizer
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, AdamW
 import torch
 import utils
@@ -29,7 +25,6 @@ class LM:
             self.model = GPT2LMHeadModel.from_pretrained(model_name, cache_dir=cache_dir).to(device)
 
         self.w_boundary_char = b'\xc4\xa0'.decode()
-
 
     def get_batch_loss(self, data_batch, device='cuda'):
         """
@@ -57,7 +52,6 @@ class LM:
         batch_token_count = np.sum(token_count_batch) - len(tokens_batch) # substract the count since len(tokens)-1 words are counted
         return loss, batch_token_count
 
-
     def get_loss(self, data, batch_size, device='cuda'):
         total_loss = 0
         total_token_count = 0
@@ -68,7 +62,6 @@ class LM:
             total_token_count += batch_token_count
 
         return total_loss/total_token_count
-
 
     def generate(self, prompt, max_len=50, top_k=50, top_p=0.92, temperature=1, n_sample=1, device='cuda'):
         """
@@ -81,7 +74,6 @@ class LM:
                                                 top_k=top_k, top_p=top_p, temperature=temperature, num_return_sequences=n_sample)
         samples = [self.tokenizer.decode(output_ids, skip_special_tokens=True).strip() for output_ids in output_ids_batch]
         return samples
-
 
     def get_word_level_perplexity(self, dev_lines, add_bos_token=True):
         loss_sum = 0
@@ -102,7 +94,6 @@ class LM:
             loss_sum += loss*(len(tokens)-1)
             total_word_count += len(line.strip().split())
         return np.exp(loss_sum/total_word_count)
-
 
     def get_surprisals(self, tokens, add_bos_token=True):
         surprisals = []
@@ -170,7 +161,6 @@ if __name__ == "__main__":
     parser.add_argument('--random_init', action='store_true', help="Randomly initialize model parameters.")
     parser.add_argument('--fpath', type=str, help='Path to text file for estimating surprisals.')
     parser.add_argument('--pretokenized', action='store_true', help="Whether input sentences for evaluating surprisals are pertokenized or not.")
-    
 
     args = parser.parse_args()
 
@@ -194,7 +184,6 @@ if __name__ == "__main__":
         checkpoint = torch.load(args.restore_from)
         # lm.model.load_state_dict(torch.load(args.restore_from))
         lm.model.load_state_dict(checkpoint['model_state_dict'])
-        
 
     # Train
     if args.do_train:
@@ -249,7 +238,7 @@ if __name__ == "__main__":
 
                 batch_count += 1
                 count += len(train_data_batch)
-                
+
                 if batch_count > 0 and batch_count % args.report == 0:
                     print('Epoch {:.3f} loss: {}'.format(epoch + count/len(train_lines), loss.item()))
 
@@ -283,7 +272,6 @@ if __name__ == "__main__":
 
             lm.model.train()
 
-
     # Test
     if args.do_test:
         lm.model.eval()
@@ -299,7 +287,6 @@ if __name__ == "__main__":
             #validation_loss = lm.get_loss(test_lines, batch_size=1)
             #print('Test loss: {}'.format(validation_loss))
             print('PPL: {}'.format(lm.get_word_level_perplexity(test_lines, add_bos_token=False)))
-
 
     # Estimate word-level surprisal values for sentences
     if args.do_eval:
@@ -338,5 +325,5 @@ if __name__ == "__main__":
                     w_surprisal += surprisals[index]
 
                     index += 1
-            
+
                 print('{}\t{}\t{}\t{}'.format(i+1, j+1, word, w_surprisal))

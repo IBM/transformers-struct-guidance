@@ -20,7 +20,7 @@ def is_next_open_bracket(line, start_idx):
             return True
         elif char == ')':
             return False
-    raise IndexError('Bracket possibly not balanced, open bracket not followed by closed bracket')    
+    raise IndexError('Bracket possibly not balanced, open bracket not followed by closed bracket')
 
 
 def get_between_brackets(line, start_idx):
@@ -29,7 +29,7 @@ def get_between_brackets(line, start_idx):
         if char == ')':
             break
         assert not(char == '(')
-        output.append(char)    
+        output.append(char)
     return ''.join(output)
 
 
@@ -40,7 +40,7 @@ def get_tags_tokens_lowercase(line):
     #print 'length of the sentence', len(line_strip)
     for i in range(len(line_strip)):
         if i == 0:
-            assert line_strip[i] == '('    
+            assert line_strip[i] == '('
         if line_strip[i] == '(' and not(is_next_open_bracket(line_strip, i)): # fulfilling this condition means this is a terminal symbol
             output.append(get_between_brackets(line_strip, i))
     #print 'output:',output
@@ -49,11 +49,11 @@ def get_tags_tokens_lowercase(line):
     output_lowercase = []
     for terminal in output:
         terminal_split = terminal.split()
-        assert len(terminal_split) == 2 # each terminal contains a POS tag and word        
+        assert len(terminal_split) == 2 # each terminal contains a POS tag and word
         output_tags.append(terminal_split[0])
         output_tokens.append(terminal_split[1])
         output_lowercase.append(terminal_split[1].lower())
-    return [output_tags, output_tokens, output_lowercase]    
+    return [output_tags, output_tokens, output_lowercase]
 
 
 def get_nonterminal(line, start_idx):
@@ -79,7 +79,7 @@ def get_actions_and_terms(line, is_generative):
             if is_next_open_bracket(line_strip, i): # open non-terminal
                 curr_NT = get_nonterminal(line_strip, i)
                 output_actions.append('NT(' + curr_NT + ')')
-                i += 1  
+                i += 1
                 while line_strip[i] != '(': # get the next open bracket, which may be a terminal or another non-terminal
                     i += 1
             else: # it's a terminal symbol
@@ -89,10 +89,10 @@ def get_actions_and_terms(line, is_generative):
                 token = terminal_split[1]
                 output_terms.append(token)
                 if is_generative:
-                    # generative parsing     
-                    output_actions.append(token) 
-                else:      
-                    # discriminative parsing       
+                    # generative parsing
+                    output_actions.append(token)
+                else:
+                    # discriminative parsing
                     output_actions += ['SHIFT']
                 while line_strip[i] != ')':
                     i += 1
@@ -100,13 +100,13 @@ def get_actions_and_terms(line, is_generative):
                 while line_strip[i] != ')' and line_strip[i] != '(':
                     i += 1
         else:
-             output_actions.append('REDUCE()')
-             if i == max_idx:
-                 break
-             i += 1
-             while line_strip[i] != ')' and line_strip[i] != '(':
-                 i += 1
-    assert i == max_idx  
+            output_actions.append('REDUCE()')
+            if i == max_idx:
+                break
+            i += 1
+            while line_strip[i] != ')' and line_strip[i] != '(':
+                i += 1
+    assert i == max_idx
     return output_actions, output_terms
 
 
@@ -145,7 +145,7 @@ def main():
             print(' '.join(output_actions))
         else:
             print(' '.join(output_terms) + '\t' + ' '.join(output_actions))
-    
+
 
 if __name__ == "__main__":
     main()

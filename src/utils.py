@@ -1,6 +1,5 @@
-import numpy as np
-
 class EarlyStopping:
+
     def __init__(self, best_validation_loss, no_improvement_count, threshold=2):
         self.best_validation_loss = best_validation_loss
         self.counter = no_improvement_count

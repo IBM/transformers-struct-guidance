@@ -1,11 +1,9 @@
-from ipdb import set_trace
 import os
 import sys
 import argparse
 import random
 import numpy as np
 import nltk
-from nltk.tokenize.treebank import TreebankWordDetokenizer
 from transformers import GPT2Tokenizer, GPT2LMHeadModel, GPT2Config, AdamW
 import torch
 import functools
@@ -60,7 +58,6 @@ class ScLM:
         self.w_boundary_char = b'\xc4\xa0'.decode()
         self.model.action_decoder = torch.nn.Linear(768, len(self.action_vocab.symbols)).to(device)
 
-
     def get_batch_loss(self, line_batch, scaffold_type, add_eos_token=False):
         """
         Assume each line of the batch input contains tokenized sentence paired with action ngram sequence.
@@ -84,7 +81,7 @@ class ScLM:
         label_ids_padded_batch = [self.tokenizer.convert_tokens_to_ids(tokens) + [-100 for _ in range(batch_max_len - len(tokens))] for tokens in tokens_batch]
         label_ids = torch.tensor(label_ids_padded_batch).to(device)
 
-        output  = self.model(input_ids, labels=label_ids, attention_mask=attention_mask, output_hidden_states=True)
+        output = self.model(input_ids, labels=label_ids, attention_mask=attention_mask, output_hidden_states=True)
 
         word_prediction_loss = output[0]
 
@@ -100,7 +97,6 @@ class ScLM:
         action_prediction_loss = cross_entropy_loss(action_prediction_logits, action_ids_batch.view(len(tokens_batch)*batch_max_len, -1).squeeze())
 
         return word_prediction_loss, action_prediction_loss
-
 
     def get_validation_loss(self, dev_lines, scaffold_type, word_prediction_loss_only=False):
         if word_prediction_loss_only:
@@ -133,7 +129,7 @@ class ScLM:
 
                 word_prediction_loss, action_prediction_loss = self.get_batch_loss(line_batch, scaffold_type, add_eos_token=False)
 
-                word_loss_sum += word_prediction_loss.item()*n_word_token 
+                word_loss_sum += word_prediction_loss.item()*n_word_token
                 action_loss_sum += action_prediction_loss.item()*n_action_token
 
                 word_token_count += n_word_token
@@ -199,7 +195,6 @@ class ScLM:
         nll_avg = nll_total/word_count
         return np.exp(nll_avg)
 
-
     def generate(self, prompt, max_len=50, top_k=50, top_p=0.92, temperature=1, n_sample=1, device='cuda'):
         """
         Sample from the model.
@@ -208,7 +203,7 @@ class ScLM:
         ids = self.tokenizer.convert_tokens_to_ids(tokens)
         input_ids = torch.tensor([ids]).to(device)
         output_ids_batch = self.model.generate(input_ids, do_sample=True, max_length=max_len, pad_token_id=50256,
-                                                top_k=top_k, top_p=top_p, temperature=temperature, num_return_sequences=n_sample)
+                                               top_k=top_k, top_p=top_p, temperature=temperature, num_return_sequences=n_sample)
         samples = [self.tokenizer.decode(output_ids, skip_special_tokens=True).strip() for output_ids in output_ids_batch]
         return samples
 
@@ -285,20 +280,20 @@ def load_data(path, tokenizer, BOS_token=None):
         assert len(word_pieces) == (len(action_ngram_seq) - 1)
 
         if BOS_token is None:
-            data.append([word_pieces, action_ngram_seq]) 
+            data.append([word_pieces, action_ngram_seq])
         else:
-            data.append([[BOS_token] + word_pieces, action_ngram_seq]) 
+            data.append([[BOS_token] + word_pieces, action_ngram_seq])
 
     return data
 
 
 def load_sent_parse_pair_data(path):
     '''
-    Load data in the format of paired sentence and action ngrams. 
+    Load data in the format of paired sentence and action ngrams.
     The sentence and action ngram sequence are separated by "\t".
     e.g.
     "The entire market is at its lowest price-earnings multiple since the dawn of time . <eos>\t
-    NT(S)_NT(NP)  _  _  REDUCE()_NT(VP) NT(PP) NT(NP)_NT(NP) _ _ _ REDUCE()_NT(PP) NT(NP)_NT(NP) _ 
+    NT(S)_NT(NP)  _  _  REDUCE()_NT(VP) NT(PP) NT(NP)_NT(NP) _ _ _ REDUCE()_NT(PP) NT(NP)_NT(NP) _
     REDUCE()_NT(PP) NT(NP) REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE()_REDUCE() REDUCE()"
     '''
     with open(path) as f:
@@ -380,7 +375,6 @@ if __name__ == "__main__":
     ALPHA = args.alpha
     print('Interpolation weight of structure prediction loss {}'.format(ALPHA), file=sys.stderr)
 
-
     # Train
     if args.do_train:
         # Path to save the newly trained model
@@ -401,7 +395,6 @@ if __name__ == "__main__":
         print("Loading dev data from {}".format(dev_data_path), file=sys.stderr)
         dev_lines = load_data(dev_data_path, sclm.tokenizer, BOS_token=sclm.tokenizer.bos_token)
 
-
         if args.restore_from is not None:
             sclm.model.eval()
             with torch.no_grad():
@@ -416,7 +409,7 @@ if __name__ == "__main__":
         starting_epoch = checkpoint['epoch'] + 1 if (args.restore_from is not None) else 0
         no_improvement_count = checkpoint['no_improvement_count'] if (args.restore_from is not None) else 0
         VALID_EVERY = None if ((args.valid_every is None) or (args.valid_every < 1)) else args.valid_every
-        
+
         early_stopping_counter = utils.EarlyStopping(best_validation_loss=best_validation_loss, no_improvement_count=no_improvement_count, threshold=args.early_stopping_threshold)
 
         for epoch in range(starting_epoch, n_epochs):
@@ -424,13 +417,13 @@ if __name__ == "__main__":
 
             count = 0  # cumulative count of training examples
             batch_count = 0 # cumulative count of training batches
-            
+
             for line_batch in get_batches(train_lines, args.batch_size):
                 optimizer.zero_grad()
 
                 word_prediction_loss, action_prediction_loss = sclm.get_batch_loss(line_batch, SCAFFOLD_TYPE, add_eos_token=True)
 
-                loss = (1 - ALPHA)*word_prediction_loss + ALPHA*action_prediction_loss
+                loss = (1 - ALPHA) * word_prediction_loss + ALPHA * action_prediction_loss
 
                 loss.backward()
                 optimizer.step()
@@ -448,7 +441,6 @@ if __name__ == "__main__":
                         for sample in samples:
                             print(sample)
                     sclm.model.train()
-
 
                 if VALID_EVERY is not None:
                     if batch_count > 0  and batch_count % VALID_EVERY == 0:
@@ -469,13 +461,12 @@ if __name__ == "__main__":
                             print("new best... saving model to {}".format(MODEL_PATH))
                             torch.save(
                                 {'epoch': epoch,
-                                'scaffold_type': SCAFFOLD_TYPE,
-                                'no_improvement_count': early_stopping_counter.counter,
-                                'model_state_dict': sclm.model.state_dict(),
-                                'loss': validation_loss}, MODEL_PATH)
+                                 'scaffold_type': SCAFFOLD_TYPE,
+                                 'no_improvement_count': early_stopping_counter.counter,
+                                 'model_state_dict': sclm.model.state_dict(),
+                                 'loss': validation_loss}, MODEL_PATH)
 
                         sclm.model.train()
-
 
             sclm.model.eval()
 
@@ -494,13 +485,12 @@ if __name__ == "__main__":
                 print("new best... saving model to {}".format(MODEL_PATH))
                 torch.save(
                     {'epoch': epoch,
-                    'scaffold_type': SCAFFOLD_TYPE,
-                    'no_improvement_count': early_stopping_counter.counter,
-                    'model_state_dict': sclm.model.state_dict(),
-                    'loss': validation_loss}, MODEL_PATH)
+                     'scaffold_type': SCAFFOLD_TYPE,
+                     'no_improvement_count': early_stopping_counter.counter,
+                     'model_state_dict': sclm.model.state_dict(),
+                     'loss': validation_loss}, MODEL_PATH)
 
             sclm.model.train()
-            
 
     if args.do_test:
         sclm.model.eval()
@@ -519,7 +509,6 @@ if __name__ == "__main__":
         with torch.no_grad():
             ppl = sclm.get_word_ppl(test_sents)
         print('PPL: {}'.format(ppl))
-
 
     # Estimate token surprisal values for unparsed sentences
     if args.do_eval:
@@ -558,6 +547,5 @@ if __name__ == "__main__":
                     w_surprisal += surprisals[index]
 
                     index += 1
-            
-                print('{}\t{}\t{}\t{}'.format(i+1, j+1, word, w_surprisal))
 
+                print('{}\t{}\t{}\t{}'.format(i+1, j+1, word, w_surprisal))
