@@ -91,7 +91,7 @@ python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffe
 
 ## Plot figures
 
-The `analysis` folder provides code and data to generate the figures in the paper. Python packages `matplotlib` and `pandas` are required to run the plotting scripts.
+The `analysis` folder contains the code and model performance results to generate the figures in the paper. Python packages `matplotlib` and `pandas` are required to run the plotting scripts. Results of RNNG are taken from [Hu et al., (2020)](https://github.com/cpllab/syntactic-generalization/tree/master/data/raw/sg_results)
 ```
 cd analysis
 mkdir -p figs
