@@ -89,6 +89,18 @@ python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffe
 python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_SUITE_PATH} > ${OUTPUT_PATH} 2>>${EVAL_LOG_PATH}
 ```
 
+## Plot figures
+
+The `analysis` folder provides code and data to generate the figures in the paper. Python packages `matplotlib` and `pandas` are required to run the plotting scripts.
+```
+cd analysis
+mkdir -p figs
+
+# Plot results on SG Test Suites and BLiMP-10%.
+python analysis_sg.py
+python analysis_blimp.py
+```
+
 ## Acknowledgements
 
 We thank Ramon Astudillo and Tahira Naseem for their contributions to the repository.
