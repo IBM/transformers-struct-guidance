@@ -1,3 +1,5 @@
+# This script generates figures of model performance comparisons on BLiMP-10%.
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -131,7 +133,6 @@ plt.title('Model Performance on BLiMP-10% Test Suites')
 plt.savefig('figs/blimp_comparison_by_corpus.pdf'.format(corpus), bbox_inches="tight")
 # plt.show()
 plt.close()
-
 
 
 # Bar plot of model performances on each cluster of phenomena

@@ -1,3 +1,5 @@
+# This script generates figures of model performance comparisons on SG Test Suites.
+
 import numpy as np
 import pandas as pd
 import re
