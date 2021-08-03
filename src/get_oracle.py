@@ -1,3 +1,5 @@
+# This script reuses and modifies some functions from: https://github.com/clab/rnng/blob/master/get_oracle_gen.py
+
 import argparse
 
 
