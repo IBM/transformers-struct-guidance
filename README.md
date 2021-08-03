@@ -33,10 +33,10 @@ python src/get_oracle.py --gen --fpath test.txt > test_gen.oracle
 
 ## Prepare action ngram list
 
-The following command generates the action ngram list for ScLM models:
+The following command generates the action ngram list for ScLM models. The training code of ScLM assumes that the action ngram list is stored in the root folder.
 
 ```
-python get_action_ngram_list.py -f path/to/bllip-lg_train_gen.oracle path/to/bllip-lg_dev_gen.oracle -o bllip-lg_action_ngram_list.txt
+python src/get_action_ngram_list.py -f path/to/bllip-lg_train_gen.oracle path/to/bllip-lg_dev_gen.oracle -o bllip-lg_action_ngram_list.txt
 ```
 
 ## Vanilla Language Models (LM)
