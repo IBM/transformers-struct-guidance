@@ -1,6 +1,6 @@
 # Structural Guidance for Transformer Language Models
 
-This repository accompanies the paper "Structural Guidance for Transformer Language Models" published in ACL 2021. It includes inplementation of Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
+This repository accompanies the paper, [Structural Guidance for Transformer Language Models](https://arxiv.org/pdf/2108.00104.pdf), published in ACL 2021. It includes inplementation of Parsing-as-Language-Modelling and structural scaffolding for Transformer language models.
 
 ## Environment
 
@@ -29,6 +29,14 @@ PLM and ScLM require syntactic parses to derive the action sequence oracle. The 
 python src/get_oracle.py --gen --fpath train.txt > train_gen.oracle
 python src/get_oracle.py --gen --fpath dev.txt > dev_gen.oracle
 python src/get_oracle.py --gen --fpath test.txt > test_gen.oracle
+```
+
+## Prepare action ngram list
+
+The following command generates the action ngram list for ScLM models:
+
+```
+python get_action_ngram_list.py -f path/to/bllip-lg_train_gen.oracle path/to/bllip-lg_dev_gen.oracle -o bllip-lg_action_ngram_list.txt
 ```
 
 ## Vanilla Language Models (LM)
