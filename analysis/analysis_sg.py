@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 import re
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import matplotlib.patches as mpatches

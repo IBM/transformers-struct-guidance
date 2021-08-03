@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 import matplotlib.patches as mpatches
@@ -65,7 +64,7 @@ for corpus in corpora:
             acc_all = [line[1] for line in results]
             acc_mean = np.mean(acc_all)
             rs[corpus][model][seed]['score'] = acc_mean
-            rs[corpus][model][seed]['results'] = [line for line in results]
+            rs[corpus][model][seed]['results'] = results
 
 
 results = load_results('results/blimp/gpt-2.txt')
