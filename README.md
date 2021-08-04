@@ -73,12 +73,12 @@ python src/lm-sc.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_
 
 ## Parsing as Language Modelling (PLM/PLM-mask)
 
-The script `src/plm-gen.py` implements the idea of generative parsing as language modelling, a probabilistic model of top-down parsing action sequence. There are two variants: PLM and PLM-mask.
+The script `src/plm-gen.py` implements the idea of generative parsing as language modelling, a probabilistic model of top-down parsing action sequence. There are two variants, PLM and PLM-mask.
 
 For PLM:
 ```
 # Model training for PLM
-python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --report ${REPORT} --sample_every ${SAMPLE_EVERY} --valid_every ${VALID_EVERY} --model_path ${MODEL_PATH}
+python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --report ${REPORT} --sample_every ${SAMPLE_EVERY} --model_path ${MODEL_PATH}
 
 # Estimate word-level perplexity with PLM
 python src/plm-gen.py --restore_from ${MODEL_PATH} --test_data test_gen.oracle --do_test
@@ -90,7 +90,7 @@ python src/plm-gen.py --restore_from ${MODEL_PATH} --do_eval --beam_size 100 --w
 For PLM-mask:
 ```
 # Model training for PLM-mask
-python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --add_structured_mask --buffer_head 0 --stack_head 1 --report ${REPORT} --sample_every ${SAMPLE_EVERY} --valid_every ${VALID_EVERY} --model_path ${MODEL_PATH}
+python src/plm-gen.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --batch_size ${BATCH_SIZE} --random_init --add_structured_mask --buffer_head 0 --stack_head 1 --report ${REPORT} --sample_every ${SAMPLE_EVERY} --model_path ${MODEL_PATH}
 
 # Estimate word-level perplexity with PLM-mask
 python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --test_data test_gen.oracle --do_test
@@ -101,7 +101,7 @@ python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffe
 
 ## Plot figures
 
-The `analysis` folder contains the code and model performance results to generate the figures in the paper. Python packages `matplotlib` and `pandas` are required to run the plotting scripts. RNNG results are taken from [Hu et al., (2020)](https://github.com/cpllab/syntactic-generalization/tree/master/data/raw/sg_results). The following commands run the plotting scripts and generate figures in the `figs` folder.
+The `analysis` folder contains the code and model evaluation results for generating the figures in the paper. The following commands run the plotting scripts and generate figures in the `figs` folder. Python packages `matplotlib` and `pandas` are required to run the plotting scripts. RNNG results are taken from [Hu et al., (2020)](https://github.com/cpllab/syntactic-generalization/tree/master/data/raw/sg_results).
 
 ```
 cd analysis
