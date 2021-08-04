@@ -21,7 +21,9 @@ bash scripts/generate_patch.sh
 and then just commit this patch
 
 
-## Prepare parsing oracle files 
+## Data preparation
+
+### Prepare parsing oracle files 
 
 PLM and ScLM require syntactic parses to derive the action sequence oracle. The following command demonstrates how to prepare oracle files for these models.
 
@@ -31,7 +33,7 @@ python src/get_oracle.py --gen --fpath dev.txt > dev_gen.oracle
 python src/get_oracle.py --gen --fpath test.txt > test_gen.oracle
 ```
 
-## Prepare action ngram list
+### Prepare action ngram list
 
 The following command generates the action ngram list for ScLM models. The training code of ScLM assumes that the action ngram list is stored in the root folder.
 
@@ -56,7 +58,7 @@ python src/lm.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PAT
 
 ## Scaffoled Language Models (ScLM)
 
-The script `src/lm-sc.py` implements Transformer language model with structural prediction as an auxilliary task, referred as ScLM in short. The commanline variable, ${SCAFFOLD_TYPE}, can be set as `past` or `next`, which corresponds to `ScLM-past` or `ScLM-next` respectively in the paper.
+The script `src/lm-sc.py` implements Transformer language model with structural prediction as an auxilliary task, referred as ScLM. The commanline variable, ${SCAFFOLD_TYPE}, can be set as `past` or `next`, which corresponds to `ScLM-past` or `ScLM-next` respectively in the paper.
 
 ```
 # Model training  
