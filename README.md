@@ -99,6 +99,10 @@ python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffe
 python src/plm-gen.py --restore_from ${MODEL_PATH} --add_structured_mask --buffer_head 0 --stack_head 1 --do_eval --beam_size 100 --word_beam_size 10 --fast_track_size 5 --pretokenized --fpath ${TEST_SUITE_PATH} > ${OUTPUT_PATH} 2>>${EVAL_LOG_PATH}
 ```
 
+## Trained models
+
+Parameters of trained models are available [here](https://www.dropbox.com/sh/akprbzhr0touxz0/AACUHwzA0UYopEPR6QtJYdu8a?dl=0).
+
 ## Plot figures
 
 The `analysis` folder contains the code and model evaluation results for generating the figures in the paper. The following commands run the plotting scripts and generate figures in the `figs` folder. Python packages `matplotlib` and `pandas` are required to run the plotting scripts. RNNG results are taken from [Hu et al., (2020)](https://github.com/cpllab/syntactic-generalization/tree/master/data/raw/sg_results).
