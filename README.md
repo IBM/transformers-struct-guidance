@@ -65,7 +65,7 @@ The script `src/lm-sc.py` implements Transformer language model with structural 
 python src/lm-sc.py --train_data train_gen.oracle --dev_data dev_gen.oracle --lr 1e-5 --epochs ${EPOCHS} --seed ${SEED} --do_train --random_init --batch_size ${BATCH_SIZE} --report ${REPORT} --sample_every ${SAMPLE_EVERY} --alpha 0.5 --scaffold_type ${SCAFFOLD_TYPE} --model_path ${MODEL_PATH}
 
 # Compute word-level perplexity
-python src/plm-gen.py --restore_from ${MODEL_PATH} --test_data test_gen.oracle --do_test
+python src/lm-sc.py --restore_from ${MODEL_PATH} --test_data test_gen.oracle --do_test
 
 # Estimate word surprisals
 python src/lm-sc.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
