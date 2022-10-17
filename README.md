@@ -56,7 +56,7 @@ python src/lm.py --restore_from ${MODEL_PATH} --test_data test.txt --do_test
 python src/lm.py --restore_from ${MODEL_PATH} --do_eval --fpath ${TEST_SUITE_PATH} --pretokenized > ${OUTPUT_PATH}
 ```
 
-## Scaffoled Language Models (ScLM)
+## Scaffolded Language Models (ScLM)
 
 The script `src/lm-sc.py` implements Transformer language model with structural prediction as an auxilliary task, referred as ScLM. The commanline variable, ${SCAFFOLD_TYPE}, can be set as `past` or `next`, which corresponds to `ScLM-past` or `ScLM-next` respectively in the paper.
 
